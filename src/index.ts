@@ -8,14 +8,19 @@ import {
 } from "./helpers";
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
 
-import cors from "cors";
+const app: Express = express();
 
-const corsOptions = {
-  origin: "http://localhost:3000",
+const setCorsHeaders = (req: Request, res: Response, next: Function) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
 };
 
-const app: Express = express();
-app.use(cors(corsOptions));
+app.use(setCorsHeaders);
 
 const port = process.env.PORT || 3005;
 
