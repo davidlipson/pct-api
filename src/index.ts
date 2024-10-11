@@ -8,7 +8,15 @@ import {
 } from "./helpers";
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
 
+import cors from "cors";
+
+const corsOptions = {
+  origin: "http://127.0.0.1:3000",
+};
+
 const app: Express = express();
+app.use(cors(corsOptions));
+
 const port = process.env.PORT || 3005;
 
 app.get("/today", async (_: Request, res: Response) => {
