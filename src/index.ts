@@ -7,13 +7,17 @@ import {
   getLeaderboard,
 } from "./helpers";
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 const app: Express = express();
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
+app.use(
+  "/",
+  createProxyMiddleware({
+    target: "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com/",
+    changeOrigin: true,
+  })
+);
 
 const port = process.env.PORT || 3005;
 
