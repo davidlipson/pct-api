@@ -28,18 +28,6 @@ const corsOptions = {
 const app: Express = express();
 app.use(cors(corsOptions));
 
-const setCorsHeaders = (req: Request, res: Response, next: Function) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-};
-
-app.use(setCorsHeaders);
-
 const port = process.env.PORT || 3005;
 
 app.get("/today", async (_: Request, res: Response) => {
