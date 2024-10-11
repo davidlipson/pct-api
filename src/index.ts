@@ -7,8 +7,26 @@ import {
   getLeaderboard,
 } from "./helpers";
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
+import cors from "cors";
+
+const allowedOrigins = [
+  "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com",
+  "http://localhost:3001",
+];
+
+const corsOptions = {
+  origin: function (origin: any, callback: Function) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  optionsSuccessStatus: 200,
+};
 
 const app: Express = express();
+app.use(cors(corsOptions));
 
 const setCorsHeaders = (req: Request, res: Response, next: Function) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
