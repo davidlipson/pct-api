@@ -24,7 +24,7 @@ app.use(
     origin:
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com/",
+        : "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com",
   })
 );
 
