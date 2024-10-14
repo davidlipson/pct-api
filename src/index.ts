@@ -9,8 +9,9 @@ import {
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
 import { findUser, generateTables, setUsername } from "./db";
 import { addWord } from "./db/addWord";
-import { fetchMyWords, myWords } from "./db/myWords";
+import { myWords } from "./db/myWords";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 (async () => {
   await generateTables();
@@ -18,6 +19,14 @@ import bodyParser from "body-parser";
 
 const app: Express = express();
 app.use(bodyParser.json());
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com/",
+  })
+);
 
 const port = process.env.PORT || 3005;
 
