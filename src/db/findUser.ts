@@ -3,7 +3,7 @@ import { client } from "./client";
 export const findUser = async ({ userId }: { userId: string }) => {
   //  find or create user
   const results = await client.query(
-    `insert into users (userId) values ($1) on conflict (userId) do nothing returning *`,
+    `insert into users (userId) values ($1) on conflict (userId) DO UPDATE SET userId = EXCLUDED.userId  returning *`,
     [userId]
   );
 
