@@ -19,12 +19,14 @@ import cors from "cors";
 
 const app: Express = express();
 app.use(bodyParser.json());
+
+// make more secure
 app.use(
   cors({
-    origin:
+    origin: "*" /*
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
-        : "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com",
+        : "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com",*/,
   })
 );
 
