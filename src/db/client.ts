@@ -17,5 +17,10 @@ export const client = new Client({
   port: parseInt(process.env.PG_PORT || "5432"),
   database: process.env.PG_DB,*/
   connectionString: process.env.DATABASE_URL,
-  ssl: true,
+  ssl:
+    process.env.NODE_ENV === "development"
+      ? false
+      : {
+          rejectUnauthorized: false,
+        },
 });
