@@ -39,7 +39,7 @@ const generateResult = (
     0
   );
   const averageWordScore = totalScore / totalWords.length;
-  const averageTargetScore = WORDS_GOAL * averageWordScore * 0.65;
+  const averageTargetScore = WORDS_GOAL * averageWordScore * 0.75;
   const levels = [
     averageTargetScore / 3,
     (2 * averageTargetScore) / 3,

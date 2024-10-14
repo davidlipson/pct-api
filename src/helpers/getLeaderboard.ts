@@ -1,14 +1,14 @@
-import { redisClient } from "../redis";
-import { todaysDateString } from "./todaysLetters";
+import { fetchCache } from "../cache";
+import { client } from "../db/client";
 
 export const getLeaderboard = async () => {
-  // log all redis keys starting with 'score/${todaysDateString()}
-  // add caching?
-  const keys = await redisClient.keys(`score/*/${todaysDateString()}`);
-  const data = await redisClient.mGet(keys);
-  const scores = keys.map((key, i) => {
-    const userId = key.split("/")[1];
-    return { userId, score: parseInt(data[i] || "0") };
-  });
-  return scores.sort((a, b) => b.score - a.score);
+  const result = await client.query(
+    `select users.userId, users.username, sum(points) as score from users left join found_words on users.userid = found_words.userid  where date_trunc('day', date) = date_trunc('day', CURRENT_TIMESTAMP - interval '1 day') group by users.userId order by score desc`
+  );
+  return result.rows;
+};
+
+export const fetchLeaderboard = async () => {
+  const result = await fetchCache("leaderboard", getLeaderboard);
+  return result;
 };

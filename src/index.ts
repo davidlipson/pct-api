@@ -2,33 +2,53 @@
 import express, { Express, Request, Response } from "express";
 import {
   calculatePoints,
+  fetchLeaderboard,
   fetchTodaysLetters,
-  updateUserScore,
   getLeaderboard,
 } from "./helpers";
 import { fetchTodaysDictionary } from "./helpers/todaysDictionary";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { findUser, generateTables, setUsername } from "./db";
+import { addWord } from "./db/addWord";
+import { fetchMyWords, myWords } from "./db/myWords";
+import bodyParser from "body-parser";
+
+(async () => {
+  await generateTables();
+})();
 
 const app: Express = express();
-
-app.use(
-  "/",
-  createProxyMiddleware({
-    target: "https://pct-game-dev-c1fe8d9e3dd7.herokuapp.com/",
-    changeOrigin: true,
-  })
-);
+app.use(bodyParser.json());
 
 const port = process.env.PORT || 3005;
 
-app.get("/today", async (_: Request, res: Response) => {
+app.get("/today", async (req: Request, res: Response) => {
   try {
+    const userId = req.query.userId as string;
+    let words = [];
+    if (userId) {
+      //words = await fetchMyWords(userId);
+      words = await myWords(userId);
+    }
     const data = await fetchTodaysLetters();
-    res.send(data);
+    res.send({ todaysLetters: data, myWords: words });
   } catch (err) {
     console.error("Redis error:", err);
     res.status(500).send("Internal Server Error");
   }
+});
+
+app.get("/login", async (req: Request, res: Response) => {
+  const userId = req.query.userId as string;
+  if (!userId) {
+    res.status(400).send("Missing userId query parameter");
+    return;
+  }
+  const foundUser = await findUser({ userId });
+  if (!foundUser) {
+    res.status(404).send("User not found");
+    return;
+  }
+  res.send(foundUser);
 });
 
 app.get("/validate", async (req: Request, res: Response) => {
@@ -46,10 +66,12 @@ app.get("/validate", async (req: Request, res: Response) => {
 
     if (isValid) {
       const points = calculatePoints(word);
-      res.send({ valid: true, points });
+
+      let myWords = [];
       if (userId) {
-        await updateUserScore(userId, points);
+        myWords = await addWord({ word, points, userId });
       }
+      res.send({ valid: true, points, myWords });
     } else {
       res.send({ valid: false });
     }
@@ -60,8 +82,17 @@ app.get("/validate", async (req: Request, res: Response) => {
 });
 
 app.get("/leaderboard", async (req: Request, res: Response) => {
-  const data = await getLeaderboard();
+  const data = await fetchLeaderboard();
   res.send(data);
+});
+
+app.post("/setUsername", async (req: Request, res: Response) => {
+  // get body of req
+  const { userId, username } = req.body;
+  await setUsername({ userId, username });
+
+  // handle failures better
+  res.send("Success");
 });
 
 app.listen(port, () => {
